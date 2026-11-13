@@ -114,6 +114,7 @@ $(function () {
     const $nipFeedback = $('#nipFeedback');
     let nipAjaxTimer   = null;
     let nipIsDuplicate = false;
+    let nipIsIncomplete = false;
 
     if ($nipInput.length && $nipFeedback.length) {
         const currentId = $nipInput.data('current-id') || 0;
@@ -129,6 +130,7 @@ $(function () {
                 $nipFeedback.empty();
                 $nipInput.removeClass('is-valid is-invalid');
                 nipIsDuplicate = false;
+                nipIsIncomplete = false;
                 return;
             }
 
@@ -153,6 +155,7 @@ $(function () {
                     success: function (response) {
                         if (response.status === 'duplicate') {
                             nipIsDuplicate = true;
+                            nipIsIncomplete = false;
                             $nipInput.addClass('is-invalid').removeClass('is-valid');
                             $nipFeedback.html(
                                 '<span class="text-danger small fw-semibold">' +
@@ -161,6 +164,7 @@ $(function () {
                             );
                         } else if (response.status === 'available') {
                             nipIsDuplicate = false;
+                            nipIsIncomplete = false;
                             $nipInput.removeClass('is-invalid').addClass('is-valid');
                             $nipFeedback.html(
                                 '<span class="text-success small fw-semibold">' +
@@ -168,7 +172,9 @@ $(function () {
                                 '</span>'
                             );
                         } else {
+                            // incomplete / invalid
                             nipIsDuplicate = false;
+                            nipIsIncomplete = true;
                             $nipInput.addClass('is-invalid').removeClass('is-valid');
                             $nipFeedback.html(
                                 '<span class="text-warning small fw-semibold">' +
@@ -277,25 +283,48 @@ $(function () {
             let isValid = true;
 
             const fields = {
-                nip:     { el: $('#nip'),     check: v => v.trim() !== '' },
-                nama:    { el: $('#nama'),    check: v => v.trim().length >= 2 },
-                email:   { el: $('#email'),   check: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()) },
-                jabatan: { el: $('#jabatan'), check: v => v.trim() !== '' },
+                nip: {
+                    el: $('#nip'),
+                    check: function (v) {
+                        const clean = v.replace(/\s+/g, '');
+                        return /^\d{18}$/.test(clean);
+                    },
+                    feedback: 'NIP wajib 18 digit angka sesuai standar resmi kepegawaian.'
+                },
+                nama: {
+                    el: $('#nama'),
+                    check: v => v.trim().length >= 2,
+                    feedback: 'Nama lengkap wajib diisi (minimal 2 karakter).'
+                },
+                email: {
+                    el: $('#email'),
+                    check: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()),
+                    feedback: 'Format email tidak valid (contoh: nama@instansi.go.id).'
+                },
+                jabatan: {
+                    el: $('#jabatan'),
+                    check: v => v.trim() !== '',
+                    feedback: 'Jabatan / posisi kerja wajib diisi.'
+                },
             };
 
             $.each(fields, function (_, f) {
                 if (!f.el.length) return;
                 const valid = f.check(f.el.val());
+                const $fb = f.el.closest('.mb-3').find('.invalid-feedback');
                 if (valid) {
                     f.el.removeClass('is-invalid');
                 } else {
                     f.el.addClass('is-invalid');
+                    if ($fb.length && f.feedback) {
+                        $fb.text(f.feedback);
+                    }
                     isValid = false;
                 }
             });
 
-            // Cegah submit jika NIP terdeteksi duplikat oleh AJAX
-            if (nipIsDuplicate) {
+            // Cegah submit jika NIP terdeteksi duplikat atau belum lengkap oleh AJAX
+            if (nipIsDuplicate || nipIsIncomplete) {
                 $('#nip').addClass('is-invalid');
                 isValid = false;
             }
@@ -304,6 +333,17 @@ $(function () {
                 event.preventDefault();
                 event.stopPropagation();
                 $employeeForm.find('.is-invalid').first().focus();
+
+                // Notifikasi ringkas di atas form agar pengguna jelas tahu ada kesalahan
+                let $alert = $employeeForm.find('> .form-submit-alert');
+                if (!$alert.length) {
+                    $alert = $('<div class="form-submit-alert alert alert-danger alert-dismissible fade show mb-3" role="alert"></div>').prependTo($employeeForm);
+                }
+                $alert.html(
+                    '<i class="bi bi-exclamation-circle-fill me-2"></i>' +
+                    'Harap lengkapi semua kolom dengan benar sebelum menyimpan data pegawai.' +
+                    '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>'
+                );
             }
         });
     }

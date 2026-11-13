@@ -56,9 +56,22 @@ if (!filter_var($emailPegawai, FILTER_VALIDATE_EMAIL)) {
     exit;
 }
 
-// --- 6. Cek Duplikasi NIP pada Record LAIN ---
-// Klausa "AND id != :id" penting: agar data pegawai ini sendiri tidak dianggap duplikat
-$nipClean = preg_replace('/\s+/', '', $nipNama);
+// --- 6. Validasi Format & Panjang NIP (Standar Resmi 18 Digit Angka) ---
+$nipClean = preg_replace('/\s+/', '', $nipNama) ?? '';
+if (!ctype_digit($nipClean)) {
+    setFlash('danger', 'NIP hanya boleh berisi angka (0-9).');
+    header("Location: ../pegawai/edit.php?id={$id}");
+    exit;
+}
+
+$digitCount = strlen($nipClean);
+if ($digitCount !== 18) {
+    setFlash('danger', 'NIP wajib tepat 18 digit angka (saat ini ' . $digitCount . ' digit). Periksa kembali NIP yang Anda masukkan.');
+    header("Location: ../pegawai/edit.php?id={$id}");
+    exit;
+}
+
+// --- 7. Cek Duplikasi NIP pada Record LAIN ---
 $stmtCheck = $pdo->prepare('SELECT id FROM employees WHERE (REPLACE(nip, " ", "") = :nip_clean OR nip = :nip_raw) AND id != :id LIMIT 1');
 $stmtCheck->execute([
     'nip_clean' => $nipClean,

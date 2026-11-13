@@ -37,8 +37,11 @@ $namaPegawai     = trim((string) ($_POST['nama'] ?? ''));
 $emailPegawai    = trim((string) ($_POST['email'] ?? ''));
 $jabatanPegawai  = trim((string) ($_POST['jabatan'] ?? ''));
 
+// NIP input may contain spaces for readability; remove whitespace before validation/storage checks.
+$nipClean = preg_replace('/\s+/', '', $nipNama) ?? '';
+
 // --- 4. Validasi Sisi Server (Server-side Validation) ---
-// Validasi server WAJIB ada, karena validasi browser (JavaScript) bisa dilewati/dimatikan
+// Validasi server WAJIB ada, karena validasi browser (JavaScript) bisa dilewati/dimatikan.
 if ($nipNama === '' || $namaPegawai === '' || $emailPegawai === '' || $jabatanPegawai === '') {
     setFlash('danger', 'Semua kolom bertanda bintang (*) wajib diisi.');
     header('Location: ../pegawai/tambah.php');
@@ -52,11 +55,24 @@ if (!filter_var($emailPegawai, FILTER_VALIDATE_EMAIL)) {
     exit;
 }
 
-// --- 5. Cek Duplikasi NIP ---
+// --- 5. Validasi Format & Panjang NIP (Standar Resmi 18 Digit Angka) ---
+if (!ctype_digit($nipClean)) {
+    setFlash('danger', 'NIP hanya boleh berisi angka (0-9).');
+    header('Location: ../pegawai/tambah.php');
+    exit;
+}
+
+$digitCount = strlen($nipClean);
+if ($digitCount !== 18) {
+    setFlash('danger', 'NIP wajib tepat 18 digit angka (saat ini ' . $digitCount . ' digit). Periksa kembali NIP yang Anda masukkan.');
+    header('Location: ../pegawai/tambah.php');
+    exit;
+}
+
+// --- 6. Cek Duplikasi NIP ---
 // NIP di tabel berstatus UNIQUE. Pencarian dilakukan dengan dua variasi:
 // - REPLACE(nip, ' ', '') = format tanpa spasi (antisipasi input 18 digit polos)
 // - nip = format asli yang tersimpan di database
-$nipClean = preg_replace('/\s+/', '', $nipNama);
 $stmtCheck = $pdo->prepare('SELECT id FROM employees WHERE REPLACE(nip, " ", "") = :nip_clean OR nip = :nip_raw LIMIT 1');
 $stmtCheck->execute([
     'nip_clean' => $nipClean,

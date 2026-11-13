@@ -85,14 +85,22 @@ if ($existing) {
     ], JSON_UNESCAPED_UNICODE);
 } else {
     $digitCount = strlen($nipClean);
-    $statusText = $digitCount === 18 
-        ? 'NIP valid (18 digit) & tersedia untuk didaftarkan.' 
-        : 'NIP tersedia (' . $digitCount . ' digit). Standar resmi 18 digit.';
 
-    echo json_encode([
-        'status'    => 'available',
-        'available' => true,
-        'digits'    => $digitCount,
-        'message'   => $statusText
-    ], JSON_UNESCAPED_UNICODE);
+    if ($digitCount === 18) {
+        // NIP tepat 18 digit dan tidak duplikat — valid
+        echo json_encode([
+            'status'    => 'available',
+            'available' => true,
+            'digits'    => $digitCount,
+            'message'   => 'NIP valid (18 digit) & tersedia untuk didaftarkan.'
+        ], JSON_UNESCAPED_UNICODE);
+    } else {
+        // NIP kurang atau lebih dari 18 digit — belum valid
+        echo json_encode([
+            'status'    => 'incomplete',
+            'available' => false,
+            'digits'    => $digitCount,
+            'message'   => 'NIP harus tepat 18 digit (' . $digitCount . ' digit saat ini). Lengkapi sebelum menyimpan.'
+        ], JSON_UNESCAPED_UNICODE);
+    }
 }
