@@ -66,7 +66,7 @@ $totalPages = max(1, (int) ceil($totalFiltered / $perPage));
 $page = min($page, $totalPages);          // cegah halaman melebihi batas
 $offset = ($page - 1) * $perPage;         // baris pertama pada halaman ini
 
-$stmt = $pdo->prepare('SELECT id, nip, nama, email, jabatan FROM employees' . $whereSql . ' ORDER BY ' . $orderBy . ' LIMIT :limit OFFSET :offset');
+$stmt = $pdo->prepare('SELECT id, nip, nama, email, jabatan, foto FROM employees' . $whereSql . ' ORDER BY ' . $orderBy . ' LIMIT :limit OFFSET :offset');
 
 // Parameter filter diikat sebagai string (LIKE / =).
 foreach ($params as $key => $value) {
@@ -152,7 +152,7 @@ $pageUrl = static function (int $targetPage) use ($queryBase): string {
                     <tr>
                         <td class="employee-row-number"><?= $offset + $index + 1 ?></td>
                         <td><span class="employee-nip"><?= e($emp['nip']) ?></span></td>
-                        <td><div class="employee-name-cell"><span class="employee-initials"><?= e($initials) ?></span><div><a href="detail.php?id=<?= (int) $emp['id'] ?>"><?= e($emp['nama']) ?></a><small><?= e($emp['jabatan']) ?></small></div></div></td>
+                        <td><div class="employee-name-cell"><?php if (!empty($emp['foto']) && file_exists(__DIR__ . '/../' . $emp['foto'])): ?><img class="employee-initials employee-photo" src="<?= $base ?>/<?= e($emp['foto']) ?>" alt="Pasfoto <?= e($emp['nama']) ?>"><?php else: ?><span class="employee-initials"><?= e($initials) ?></span><?php endif; ?><div><a href="detail.php?id=<?= (int) $emp['id'] ?>"><?= e($emp['nama']) ?></a><small><?= e($emp['jabatan']) ?></small></div></div></td>
                         <td><a class="employee-email" href="mailto:<?= e($emp['email']) ?>"><?= e($emp['email']) ?></a></td>
                         <td><span class="employee-position"><?= e($emp['jabatan']) ?></span></td>
                         <td><span class="employee-status"><i></i>Terdaftar</span></td>

@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 // Muat koneksi database dan fungsi helper
 require __DIR__ . '/../config/koneksi.php';
+require __DIR__ . '/../config/upload.php';
 
 // Pastikan hanya user login yang bisa mengeksekusi
 checkLogin();
@@ -85,10 +86,21 @@ if ($stmtCheck->fetch()) {
     exit;
 }
 
-// --- 6. Eksekusi Query INSERT dengan Prepared Statement ---
+// --- 7. Penanganan Upload Pasfoto ---
+// Foto opsional: tidak wajib diisi. Jika diunggah, validasi di config/upload.php (max 2MB, JPG/PNG).
+$fotoPath = null;
+try {
+    $fotoPath = pegawaiPhotoUpload($_FILES['foto'] ?? null);
+} catch (Exception $e) {
+    setFlash('danger', $e->getMessage());
+    header('Location: ../pegawai/tambah.php');
+    exit;
+}
+
+// --- 8. Eksekusi Query INSERT dengan Prepared Statement ---
 // Prepared statement melindungi database dari serangan SQL Injection
-$sql = 'INSERT INTO employees (nip, nama, email, jabatan) 
-        VALUES (:nip, :nama, :email, :jabatan)';
+$sql = 'INSERT INTO employees (nip, nama, email, jabatan, foto)
+        VALUES (:nip, :nama, :email, :jabatan, :foto)';
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute([
@@ -96,6 +108,7 @@ $stmt->execute([
     'nama'    => $namaPegawai,
     'email'   => $emailPegawai,
     'jabatan' => $jabatanPegawai,
+    'foto'    => $fotoPath,
 ]);
 
 // --- 7. Berikan Pesan Sukses & Redirect (Pola PRG: Post-Redirect-Get) ---

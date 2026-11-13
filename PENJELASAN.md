@@ -199,7 +199,7 @@
 
 **Fitur:**
 - **AJAX NIP Check:** Input NIP memiliki id `nip` yang dipantau oleh `script.js`. Saat user mengetik, AJAX request dikirim ke `api/cek_nip.php` untuk mengecek duplikasi secara real-time.
-- **Photo Upload Box:** UI upload pasfoto (hanya tampilan, belum ada backend handler).
+- **Photo Upload Box:** UI dan upload pasfoto resmi pegawai (didukung preview langsung, format JPEG/PNG, maks 2MB). Berkas disimpan di `uploads/pegawai/` melalui helper `config/upload.php`.
 - **Validasi Client-side:** Script.js menangani validasi wajib isi sebelum submit.
 
 ---

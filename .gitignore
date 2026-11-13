@@ -16,3 +16,7 @@ desktop.ini
 # Composer (kalau nanti pakai)
 /vendor/
 composer.lock
+
+# Ignore user uploads except .gitkeep
+uploads/pegawai/*
+!uploads/pegawai/.gitkeep

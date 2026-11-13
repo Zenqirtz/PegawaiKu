@@ -30,7 +30,7 @@ if ($id <= 0) {
     exit;
 }
 
-$stmt = $pdo->prepare('SELECT id, nip, nama, email, jabatan FROM employees WHERE id = :id LIMIT 1');
+$stmt = $pdo->prepare('SELECT id, nip, nama, email, jabatan, foto FROM employees WHERE id = :id LIMIT 1');
 $stmt->execute(['id' => $id]);
 $employee = $stmt->fetch();
 
@@ -56,5 +56,6 @@ echo json_encode([
         'email'    => (string) $employee['email'],
         'jabatan'  => (string) ($employee['jabatan'] ?: 'Staf Pelaksana'),
         'initial'  => $initials,
+        'foto'     => (string) ($employee['foto'] ?? ''),
     ]
 ], JSON_UNESCAPED_UNICODE);

@@ -24,7 +24,7 @@ if ($id <= 0) {
 
 // --- 2. Ambil Data Pegawai Lama dari Database ---
 // Menggunakan prepared statement untuk mencegah manipulasi query (SQL Injection)
-$stmt = $pdo->prepare('SELECT id, nip, nama, email, jabatan FROM employees WHERE id = :id');
+$stmt = $pdo->prepare('SELECT id, nip, nama, email, jabatan, foto FROM employees WHERE id = :id');
 $stmt->execute(['id' => $id]);
 $employee = $stmt->fetch();
 
@@ -70,7 +70,7 @@ require __DIR__ . '/../partials/header.php';
          value tiap input diisi dari $employee (data lama dari DB)
          hidden input 'id' memberitahu record mana yang diubah
          ============================================================ -->
-    <form id="formPegawai" method="post" action="../proses/update.php" novalidate>
+    <form id="formPegawai" method="post" action="../proses/update.php" enctype="multipart/form-data" novalidate>
 
         <!-- Token CSRF wajib di setiap form POST -->
         <!-- Token CSRF diverifikasi di proses/update.php untuk menolak request dari situs lain. -->
@@ -88,7 +88,31 @@ require __DIR__ . '/../partials/header.php';
                         <p class="form-section-subtitle">Data legalitas kependudukan dan registrasi aparatur resmi.</p>
                     </div>
                 </div>
-                <span class="badge-section-number">Bagian 01</span>
+                <span class="badge-section-number">BAGIAN 01</span>
+            </div>
+
+            <!-- Upload Pasfoto Resmi Pegawai -->
+            <div class="photo-upload-box">
+                <label for="foto" class="avatar-preview-wrapper" title="Klik untuk pilih pasfoto">
+                    <?php if (!empty($employee['foto']) && file_exists(__DIR__ . '/../' . $employee['foto'])): ?>
+                        <img src="<?= $base ?>/<?= e($employee['foto']) ?>" alt="Pasfoto Pegawai" class="avatar-preview-img d-block" id="avatarPreview">
+                        <i class="bi bi-person-circle avatar-placeholder-icon d-none"></i>
+                    <?php else: ?>
+                        <i class="bi bi-person-circle avatar-placeholder-icon"></i>
+                        <img alt="Preview Pasfoto" class="avatar-preview-img" id="avatarPreview">
+                    <?php endif; ?>
+                    <span class="avatar-camera-btn" title="Pilih Foto">
+                        <i class="bi bi-camera-fill"></i>
+                    </span>
+                </label>
+                <div class="photo-upload-info">
+                    <h5>Pasfoto Resmi Pegawai</h5>
+                    <p>Format file didukung: JPEG atau PNG. Resolusi minimal 400&times;600 px (Maks. 2MB). Latar belakang merah/biru dianjurkan.</p>
+                    <label for="foto" class="btn-upload-photo">
+                        <i class="bi bi-upload"></i> Unggah Foto Resmi
+                    </label>
+                    <input type="file" name="foto" id="foto" accept="image/jpeg,image/png,image/jpg" class="d-none">
+                </div>
             </div>
 
             <div class="row">
@@ -104,7 +128,7 @@ require __DIR__ . '/../partials/header.php';
                     </div>
                     <!-- Feedback AJAX Real-time (jQuery) ketersediaan / duplikasi NIP -->
                     <div id="nipFeedback" class="mt-1"></div>
-                    <div class="input-hint"><i class="bi bi-info-circle"></i> Format standar 18 digit NIP resmi kepegawaian (Tahun.Lahir/Bulan.Lahir/NIP, tanpa pemisah huruf).</div>
+                    <div class="input-hint"><i class="bi bi-info-circle"></i> Format standar 18 digit NIP resmi kepegawaian (TahunLahir BulanLahir TMT JenisKelamin Urut)</div>
                     <div class="invalid-feedback">NIP wajib diisi.</div>
                 </div>
 
@@ -117,7 +141,7 @@ require __DIR__ . '/../partials/header.php';
                         <i class="bi bi-person input-group-icon"></i>
                         <input type="text" class="form-control-modern" id="nama" name="nama" value="<?= e($employee['nama']) ?>" placeholder="Contoh: Ahmad Fauzi, S.T., M.Kom." required>
                     </div>
-                    <div class="input-hint"><i class="bi bi-info-circle"></i> Gunakan huruf kapital sesuai kartu identitas KTP dan ijazah terakhir.</div>
+                    <div class="input-hint"><i class="bi bi-info-circle"></i> Gunakan huruf kapital sesuai kartu identitas KTP dan ijazah terakhir</div>
                     <div class="invalid-feedback">Nama wajib diisi (minimal 2 karakter).</div>
                 </div>
             </div>

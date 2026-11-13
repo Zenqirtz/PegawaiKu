@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 // Muat koneksi database dan fungsi helper
 require __DIR__ . '/../config/koneksi.php';
+require __DIR__ . '/../config/upload.php';
 
 // Pastikan hanya user login yang bisa mengeksekusi
 checkLogin();
@@ -85,9 +86,30 @@ if ($stmtCheck->fetch()) {
     exit;
 }
 
-// --- 7. Eksekusi Query UPDATE dengan Prepared Statement ---
-$sql = 'UPDATE employees 
-        SET nip = :nip, nama = :nama, email = :email, jabatan = :jabatan 
+// Ambil data foto lama untuk dipertahankan jika tidak ada unggahan baru
+$stmtOld = $pdo->prepare('SELECT foto FROM employees WHERE id = :id');
+$stmtOld->execute(['id' => $id]);
+$currentFoto = $stmtOld->fetchColumn();
+
+// --- 8. Penanganan Upload Pasfoto Baru (opsional) ---
+$fotoPath = $currentFoto ?: null;
+try {
+    $newFotoPath = pegawaiPhotoUpload($_FILES['foto'] ?? null);
+} catch (Exception $e) {
+    setFlash('danger', $e->getMessage());
+    header("Location: ../pegawai/edit.php?id={$id}");
+    exit;
+}
+
+if ($newFotoPath !== null) {
+    $fotoPath = $newFotoPath;
+    // Hapus foto lama hanya setelah upload baru berhasil
+    pegawaiPhotoDelete($currentFoto ?: null);
+}
+
+// --- 9. Eksekusi Query UPDATE dengan Prepared Statement ---
+$sql = 'UPDATE employees
+        SET nip = :nip, nama = :nama, email = :email, jabatan = :jabatan, foto = :foto
         WHERE id = :id';
 
 $stmt = $pdo->prepare($sql);
@@ -96,6 +118,7 @@ $stmt->execute([
     'nama'    => $namaPegawai,
     'email'   => $emailPegawai,
     'jabatan' => $jabatanPegawai,
+    'foto'    => $fotoPath,
     'id'      => $id,
 ]);
 

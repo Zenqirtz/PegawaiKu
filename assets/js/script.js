@@ -227,9 +227,12 @@ $(function () {
             .done(function (res) {
                 if (res.status === 'success' && res.data) {
                     const d = res.data;
+                    const avatarContent = d.foto
+                        ? '<img src="' + appBase + '/' + escapeHtml(d.foto) + '" alt="' + escapeHtml(d.nama) + '" class="quickview-avatar mx-auto mb-2 object-fit-cover shadow-sm p-0 border border-2 border-white">'
+                        : '<div class="quickview-avatar mx-auto mb-2">' + escapeHtml(d.initial) + '</div>';
                     const html =
                         '<div class="text-center pb-3 border-bottom mb-3">' +
-                            '<div class="quickview-avatar mx-auto mb-2">' + escapeHtml(d.initial) + '</div>' +
+                            avatarContent +
                             '<h5 class="fw-bold mb-1 text-dark">' + escapeHtml(d.nama) + '</h5>' +
                             '<span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1 rounded-pill">' +
                                 escapeHtml(d.jabatan) +
@@ -272,6 +275,34 @@ $(function () {
     function escapeHtml(text) {
         return $('<div>').text(text || '').html();
     }
+
+    // ============================================================
+    // 3.5. PREVIEW PASFOTO PEGAWAI REAL-TIME
+    // ============================================================
+    $('#foto').on('change', function () {
+        const file = this.files && this.files[0];
+        if (file) {
+            // Validasi ukuran maks 2MB
+            if (file.size > 2 * 1024 * 1024) {
+                alert('Ukuran pasfoto terlalu besar. Maksimal 2MB.');
+                $(this).val('');
+                return;
+            }
+            // Validasi tipe berkas
+            if (!['image/jpeg', 'image/png', 'image/jpg'].includes(file.type)) {
+                alert('Format pasfoto tidak didukung. Harap unggah format JPG atau PNG.');
+                $(this).val('');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                $('#avatarPreview').attr('src', e.target.result).removeClass('d-none').show();
+                $('.avatar-placeholder-icon').addClass('d-none');
+            };
+            reader.readAsDataURL(file);
+        }
+    });
 
     // ============================================================
     // 4. VALIDASI FORM PEGAWAI SISI KLIEN (Tambah & Edit)

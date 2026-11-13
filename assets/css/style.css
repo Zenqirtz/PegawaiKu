@@ -1649,6 +1649,11 @@ body, button, input, select, textarea { font-family: 'Plus Jakarta Sans', system
     flex-shrink: 0;
 }
 
+.employee-photo {
+    object-fit: cover;
+    border: 1px solid #e2e8f0;
+}
+
 .employee-name-cell a {
     color: #0f172a;
     font-weight: 700;
@@ -1939,32 +1944,33 @@ body, button, input, select, textarea { font-family: 'Plus Jakarta Sans', system
 
 /* Upload Pasfoto Box */
 .photo-upload-box {
-    background: #f8fafc;
-    border: 1px dashed #cbd5e1;
-    border-radius: 12px;
-    padding: 1.2rem 1.35rem;
+    background: #eef4ff;
+    border: 1px solid #dbeafe;
+    border-radius: 14px;
+    padding: 1.25rem 1.45rem;
     display: flex;
     align-items: center;
-    gap: 1.25rem;
-    margin-bottom: 1.35rem;
+    gap: 1.35rem;
+    margin-bottom: 1.45rem;
     flex-wrap: wrap;
 }
 
 .avatar-preview-wrapper {
     position: relative;
-    width: 74px;
-    height: 74px;
+    width: 82px;
+    height: 82px;
     border-radius: 50%;
-    background: #e0e7ff;
-    color: #4338ca;
+    background: #dbeafe;
+    color: #64748b;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2.5rem;
+    font-size: 2.85rem;
     flex-shrink: 0;
     border: 3px solid #ffffff;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
     overflow: visible;
+    cursor: pointer;
 }
 
 .avatar-preview-img {
@@ -1977,10 +1983,10 @@ body, button, input, select, textarea { font-family: 'Plus Jakarta Sans', system
 
 .avatar-camera-btn {
     position: absolute;
-    bottom: -2px;
-    right: -2px;
-    width: 26px;
-    height: 26px;
+    bottom: -1px;
+    right: -1px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     background: #2563eb;
     color: #ffffff;
@@ -1988,45 +1994,62 @@ body, button, input, select, textarea { font-family: 'Plus Jakarta Sans', system
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.72rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    font-size: 0.78rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.16);
     cursor: pointer;
+    transition: background-color 0.15s, transform 0.15s;
+}
+
+.avatar-camera-btn:hover {
+    background: #1d4ed8;
+    transform: scale(1.08);
 }
 
 .photo-upload-info h5 {
-    font-size: 0.88rem;
+    font-size: 0.92rem;
     font-weight: 700;
     color: #0f172a;
-    margin: 0 0 0.2rem;
+    margin: 0 0 0.25rem;
 }
 
 .photo-upload-info p {
-    font-size: 0.74rem;
+    font-size: 0.76rem;
     color: #64748b;
     margin: 0 0 0.65rem;
     max-width: 580px;
-    line-height: 1.4;
+    line-height: 1.45;
 }
 
 .btn-upload-photo {
     background: #ffffff;
     border: 1px solid #cbd5e1;
-    color: #334155;
+    color: #0f172a;
     font-size: 0.78rem;
     font-weight: 600;
-    padding: 0.35rem 0.85rem;
-    border-radius: 7px;
+    padding: 0.4rem 0.9rem;
+    border-radius: 8px;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
-    transition: background 0.15s, border-color 0.15s;
+    gap: 0.4rem;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+    transition: background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s;
 }
 
 .btn-upload-photo:hover {
-    background: #f1f5f9;
+    background: #f8fafc;
     border-color: #94a3b8;
-    color: #0f172a;
+    color: #2563eb;
+    box-shadow: 0 2px 4px rgba(15, 23, 42, 0.08);
+}
+
+.employee-avatar-img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 1px solid #e2e8f0;
 }
 
 /* Modern Input Groups */

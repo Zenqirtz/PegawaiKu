@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 // Muat koneksi database, session, dan helper
 require __DIR__ . '/../config/koneksi.php';
+require __DIR__ . '/../config/upload.php';
 
 // Hanya user yang sudah login boleh menghapus data
 checkLogin();
@@ -36,6 +37,11 @@ if ($id <= 0) {
     exit;
 }
 
+// Ambil info foto sebelum dihapus dari database
+$stmtFoto = $pdo->prepare('SELECT foto FROM employees WHERE id = :id');
+$stmtFoto->execute(['id' => $id]);
+$fotoToDelete = $stmtFoto->fetchColumn();
+
 // --- 4. Jalankan Query DELETE dengan Prepared Statement ---
 // WHERE id memastikan hanya pegawai dengan ID tersebut yang terhapus
 $stmt = $pdo->prepare('DELETE FROM employees WHERE id = :id');
@@ -43,6 +49,7 @@ $stmt->execute(['id' => $id]);
 
 // rowCount() memberi tahu apakah ada baris yang benar-benar terhapus
 if ($stmt->rowCount() > 0) {
+    pegawaiPhotoDelete($fotoToDelete ?: null);
     setFlash('success', 'Data pegawai berhasil dihapus.');
 } else {
     setFlash('danger', 'Data pegawai tidak ditemukan atau sudah dihapus.');

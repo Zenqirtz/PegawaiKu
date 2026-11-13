@@ -23,7 +23,7 @@ if ($id <= 0) {
 
 // --- 2. Query Data Pegawai Berdasarkan ID ---
 // Menggunakan prepared statement (:id) untuk mencegah SQL Injection
-$stmt = $pdo->prepare('SELECT id, nip, nama, email, jabatan FROM employees WHERE id = :id');
+$stmt = $pdo->prepare('SELECT id, nip, nama, email, jabatan, foto FROM employees WHERE id = :id');
 $stmt->execute(['id' => $id]);
 $employee = $stmt->fetch();
 
@@ -62,11 +62,15 @@ require __DIR__ . '/../partials/header.php';
      ============================================================ -->
 <div class="card p-4" style="max-width: 700px;">
 
-    <!-- Avatar inisial + nama + jabatan -->
+    <!-- Avatar inisial / pasfoto + nama + jabatan -->
     <div class="d-flex align-items-center mb-4 pb-4 border-bottom gap-3">
-        <div class="stat-icon bg-primary bg-opacity-10 text-primary" style="font-size:1.75rem; width:60px; height:60px;">
-            <?= e(mb_strtoupper(mb_substr($employee['nama'], 0, 1))) ?>
-        </div>
+        <?php if (!empty($employee['foto']) && file_exists(__DIR__ . '/../' . $employee['foto'])): ?>
+            <img src="<?= $base ?>/<?= e($employee['foto']) ?>" alt="Pasfoto Pegawai" class="rounded-circle object-fit-cover shadow-sm" style="width:64px; height:64px;">
+        <?php else: ?>
+            <div class="stat-icon bg-primary bg-opacity-10 text-primary" style="font-size:1.75rem; width:64px; height:64px;">
+                <?= e(mb_strtoupper(mb_substr($employee['nama'], 0, 1))) ?>
+            </div>
+        <?php endif; ?>
         <div>
             <h2 class="h4 fw-bold mb-0"><?= e($employee['nama']) ?></h2>
             <p class="text-secondary mb-0 small"><?= e($employee['jabatan']) ?></p>

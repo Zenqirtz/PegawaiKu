@@ -30,7 +30,8 @@ CREATE TABLE IF NOT EXISTS employees (
     nip VARCHAR(30) UNIQUE,
     nama VARCHAR(100) NOT NULL,
     email VARCHAR(100),
-    jabatan VARCHAR(80)
+    jabatan VARCHAR(80),
+    foto VARCHAR(255) DEFAULT NULL
 );
 
 -- ------------------------------------------------------------
