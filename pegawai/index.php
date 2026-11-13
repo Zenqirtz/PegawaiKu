@@ -95,7 +95,7 @@ $pageUrl = static function (int $targetPage) use ($queryBase): string {
 <div class="employee-page">
     <div class="employee-breadcrumb">
         <a href="<?= $base ?>/dashboard.php">Dashboard</a><i class="bi bi-chevron-right"></i>
-        <span>Data Pegawai</span><span class="employee-total-badge">Total <?= number_format($totalPegawai) ?> Pegawai</span>
+        <span>Data Pegawai</span>
     </div>
 
     <div class="employee-page-heading">

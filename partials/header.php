@@ -108,14 +108,12 @@ $firstLetter = mb_strtoupper(mb_substr($userName, 0, 1));
                 <i class="bi bi-list"></i>
             </button>
 
-            <!-- Breadcrumb Navigation -->
+            <!-- Breadcrumb Navigation: tampil nama aplikasi di topbar tengah -->
             <div class="topbar-breadcrumb d-none d-md-flex align-items-center">
                 <div class="breadcrumb-icon-badge me-2">
                     <i class="bi bi-person-badge"></i>
                 </div>
-                <span class="text-secondary small">Kepegawaian</span>
-                <i class="bi bi-chevron-right mx-2 text-muted small" style="font-size:0.75rem;"></i>
-                <span class="fw-semibold text-dark small">Aplikasi Terpadu</span>
+                <span class="fw-semibold text-dark small">PegawaiKu</span>
             </div>
 
             <!-- Topbar Right: Search Input + Notification + Status Badge + User -->

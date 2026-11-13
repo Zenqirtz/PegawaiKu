@@ -40,9 +40,6 @@ $activePage = 'pegawai';
 require __DIR__ . '/../partials/header.php';
 ?>
 
-require __DIR__ . '/../partials/header.php';
-?>
-
 <!-- Header Halaman + Tombol Aksi -->
 <div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-3">
     <div>

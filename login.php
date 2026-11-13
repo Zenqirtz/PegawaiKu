@@ -63,12 +63,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <!-- CSS Custom -->
-    <link href="assets/css/style.css" rel="stylesheet">
+    <link href="assets/css/style.css?v=<?= filemtime(__DIR__ . '/assets/css/style.css') ?>" rel="stylesheet">
 </head>
-<body class="bg-light">
+<body class="bg-light login-page">
 
 <div class="container d-flex align-items-center justify-content-center" style="min-height: 100vh;">
-    <div class="card p-4 shadow-sm fade-in" style="width: 100%; max-width: 420px;">
+    <div class="card p-4 shadow-sm login-card" style="width: 100%; max-width: 420px;">
 
         <!-- Header Kartu: Logo dan Judul -->
         <div class="text-center mb-4">
@@ -109,12 +109,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </button>
         </form>
 
-        <!-- Petunjuk Akun Demo untuk Penguji/Asesor -->
-        <div class="mt-4 p-2 bg-light rounded border text-center small text-secondary">
-            Akun Demo: <code>admin</code> / <code>admin123</code>
-        </div>
 
-        <p class="text-center text-secondary small mt-3 mb-0">PegawaiKu &bull; Latihan BNSP JWD &bull; UKOM 2026</p>
+        <p class="text-center text-secondary small mt-3 mb-0">PegawaiKu &bull; Sistem Informasi Kepegawaian</p>
     </div>
 </div>
 

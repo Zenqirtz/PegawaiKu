@@ -47,18 +47,16 @@ if (empty($_SESSION['csrf_token'])) {
 }
 
 // ============================================================
-// FUNGSI HELPER
+// FUNGSI HELPER (digunakan oleh semua halaman aplikasi)
 // ============================================================
 
 /**
  * e() - Escape output HTML (mencegah serangan XSS)
- * Setiap data yang ditampilkan ke browser WAJIB lewat fungsi ini
+ * Setiap data yang ditampilkan ke browser WAJIB lewat fungsi ini.
+ * Mengubah karakter spesial (like < > & " ') menjadi entitas HTML
+ * agar tidak bisa dieksekusi sebagai skrip oleh browser.
  */
 if (!function_exists('e')) {
-    /**
-     * e() - Escape output HTML (mencegah serangan XSS)
-     * Setiap data yang ditampilkan ke browser WAJIB lewat fungsi ini
-     */
     function e(?string $str): string
     {
         return htmlspecialchars($str ?? '', ENT_QUOTES, 'UTF-8');
@@ -118,9 +116,11 @@ if (!function_exists('basePath')) {
      */
     function basePath(): string
     {
-        // Cek apakah file saat ini ada di subfolder
-        $scriptDir = dirname($_SERVER['SCRIPT_NAME'] ?? '');
-        if (str_contains($scriptDir, '/pegawai')) {
+        // Hanya halaman di folder pegawai/ yang perlu naik satu level.
+        // Jangan pakai str_contains('/pegawai'): nama project pegawaiku_jwd
+        // juga mengandung kata tersebut.
+        $scriptDir = trim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/\\');
+        if (basename($scriptDir) === 'pegawai') {
             return '..';
         }
         return '.';
