@@ -1,0 +1,79 @@
+/* ============================================================
+   AJAX UI COMPONENTS
+   ============================================================ */
+.dashboard-hero-img {
+    width: min(100%, 350px);
+    height: auto;
+    max-height: 140px;
+    object-fit: contain;
+    filter: drop-shadow(0 5px 12px rgba(37, 99, 235, 0.08));
+}
+
+.quickview-modal {
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.16);
+}
+
+.quickview-title {
+    font-weight: 800;
+    font-size: 1rem;
+    color: #0f172a;
+}
+
+.quickview-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 58px;
+    height: 58px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+    color: #1d4ed8;
+    font-size: 1.15rem;
+    font-weight: 800;
+    border: 1px solid #bfdbfe;
+}
+
+.quickview-info-list {
+    display: grid;
+    gap: 0.55rem;
+}
+
+.quickview-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid #eef2f7;
+    border-radius: 9px;
+    background: #fbfdff;
+}
+
+.quickview-info-label {
+    color: #64748b;
+    font-size: 0.72rem;
+    font-weight: 600;
+}
+
+.quickview-info-value {
+    color: #1e293b;
+    font-size: 0.82rem;
+    overflow-wrap: anywhere;
+}
+
+#nipFeedback:empty {
+    display: none;
+}
+
+#nipFeedback:not(:empty) {
+    min-height: 1.4rem;
+}
+
+@media (max-width: 767.98px) {
+    .dashboard-hero-img {
+        width: min(100%, 280px);
+        max-height: 120px;
+        margin-top: 0.25rem;
+    }
+}
