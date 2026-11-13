@@ -17,6 +17,12 @@ $totalPegawai = (int) $pdo->query('SELECT COUNT(*) FROM employees')->fetchColumn
 // COUNT(DISTINCT jabatan) menghitung berapa jenis jabatan unik yang digunakan
 $totalJabatan = (int) $pdo->query('SELECT COUNT(DISTINCT jabatan) FROM employees WHERE jabatan IS NOT NULL')->fetchColumn();
 
+// Statistik Cuti & Izin real-time dari database
+$totalCutiIzin = (int) $pdo->query("SELECT COUNT(*) FROM employees WHERE status IN ('cuti', 'izin')")->fetchColumn();
+$totalCuti = (int) $pdo->query("SELECT COUNT(*) FROM employees WHERE status = 'cuti'")->fetchColumn();
+$totalIzin = (int) $pdo->query("SELECT COUNT(*) FROM employees WHERE status = 'izin'")->fetchColumn();
+$totalAktif = (int) $pdo->query("SELECT COUNT(*) FROM employees WHERE status = 'aktif'")->fetchColumn();
+
 // --- 2. Query Distribusi Pegawai per Jabatan ---
 // Mengelompokkan pegawai berdasarkan nama jabatan (GROUP BY)
 // lalu menghitung jumlah orang per jabatan (COUNT(*)) dan diurutkan terbanyak
@@ -31,7 +37,7 @@ $distribusiJabatan = $stmtDistribution->fetchAll();
 // --- 3. Ambil 5 Data Pegawai yang Baru Didaftarkan ---
 // ORDER BY id DESC mengambil id terbesar terlebih dahulu (data paling baru)
 // LIMIT 5 membatasi hasil maksimal hanya 5 baris
-$stmtRecent = $pdo->query('SELECT id, nip, nama, email, jabatan FROM employees ORDER BY id DESC LIMIT 5');
+$stmtRecent = $pdo->query('SELECT id, nip, nama, email, jabatan, status, foto FROM employees ORDER BY id DESC LIMIT 5');
 $recentEmployees = $stmtRecent->fetchAll();
 
 // --- 4. Format Tanggal Indonesia Manual (tanpa modul intl/setlocale) ---
@@ -98,11 +104,11 @@ require __DIR__ . '/partials/header.php';
     <!-- ========== KOLOM KIRI (70%): Stat Cards + Tabel Roster ========== -->
     <div class="col-xl-8">
 
-        <!-- Baris 2 Stat Card -->
+        <!-- Baris 3 Stat Card -->
         <div class="row g-3 mb-4">
 
             <!-- Card 1: TOTAL PEGAWAI -->
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <div class="card stat-card-modern h-100">
                     <div class="card-body p-4">
                         <div class="d-flex justify-content-between align-items-start mb-2">
@@ -122,7 +128,7 @@ require __DIR__ . '/partials/header.php';
 
                         <div class="stat-card-bottom-bar pt-3 border-top d-flex justify-content-between align-items-center small">
                             <span class="text-secondary">
-                                <i class="bi bi-database-check text-success me-1"></i> Diperbarui langsung dari database
+                                <i class="bi bi-database-check text-success me-1"></i> Real-time DB
                             </span>
                             <a class="fw-semibold text-primary text-decoration-none" href="pegawai/index.php">Lihat data</a>
                         </div>
@@ -131,7 +137,7 @@ require __DIR__ . '/partials/header.php';
             </div>
 
             <!-- Card 2: TOTAL JABATAN -->
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <div class="card stat-card-modern h-100">
                     <div class="card-body p-4">
                         <div class="d-flex justify-content-between align-items-start mb-2">
@@ -143,16 +149,44 @@ require __DIR__ . '/partials/header.php';
 
                         <div class="d-flex align-items-baseline gap-2 mb-1">
                             <span class="stat-main-number"><?= $totalJabatan ?></span>
-                            <span class="text-secondary small fw-medium">Jabatan Aktif</span>
+                            <span class="text-secondary small fw-medium">Jabatan</span>
                         </div>
 
                         <div class="text-secondary small mb-3">
-                            Jumlah variasi peran yang digunakan
+                            Variasi formasi peran
                         </div>
 
                         <div class="stat-card-bottom-bar pt-3 border-top d-flex justify-content-between align-items-center small text-secondary">
-                            <span>Sesuai data pegawai yang tersimpan</span>
+                            <span>Sesuai data aktif</span>
                             <i class="bi bi-briefcase text-muted"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3: SEDANG CUTI / IZIN -->
+            <div class="col-md-4">
+                <div class="card stat-card-modern h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="stat-card-label">SEDANG CUTI / IZIN</span>
+                            <div class="stat-icon-circle bg-blue-subtle text-primary">
+                                <i class="bi bi-calendar-x"></i>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-baseline gap-2 mb-1">
+                            <span class="stat-main-number"><?= $totalCutiIzin ?></span>
+                            <span class="text-secondary small fw-medium"><?= $totalCuti ?> Cuti</span>
+                        </div>
+
+                        <div class="text-secondary small mb-3">
+                            <?= $totalIzin > 0 ? $totalIzin . ' pegawai sedang izin' : 'Tidak ada pegawai izin' ?>
+                        </div>
+
+                        <div class="stat-card-bottom-bar pt-3 border-top d-flex justify-content-between align-items-center small text-secondary">
+                            <span><i class="bi bi-clock-history text-primary me-1"></i> Status hari ini</span>
+                            <a class="fw-semibold text-primary text-decoration-none" href="pegawai/index.php?status=cuti">Filter cuti</a>
                         </div>
                     </div>
                 </div>
@@ -176,16 +210,17 @@ require __DIR__ . '/partials/header.php';
                 <table class="table roster-table align-middle mb-0">
                     <thead>
                         <tr>
-                            <th style="width: 26%;">NIP</th>
-                            <th style="width: 36%;">NAMA LENGKAP</th>
-                            <th style="width: 26%;">EMAIL</th>
-                            <th style="width: 12%;" class="text-end">AKSI</th>
+                            <th style="width: 22%;">NIP</th>
+                            <th style="width: 32%;">NAMA LENGKAP</th>
+                            <th style="width: 22%;">EMAIL</th>
+                            <th style="width: 14%;">STATUS</th>
+                            <th style="width: 10%;" class="text-end">AKSI</th>
                         </tr>
                     </thead>
                     <tbody>
                     <?php if (empty($recentEmployees)): ?>
                         <tr>
-                            <td colspan="4" class="text-center text-secondary py-5">
+                            <td colspan="5" class="text-center text-secondary py-5">
                                 Belum ada data pegawai. Silakan tambah data baru.
                             </td>
                         </tr>
@@ -195,6 +230,7 @@ require __DIR__ . '/partials/header.php';
                             $colors = ['#2563eb', '#059669', '#d97706', '#7c3aed', '#dc2626'];
                             $color = $colors[$i % count($colors)];
                             $initial = mb_strtoupper(mb_substr($emp['nama'], 0, 2));
+                            $rosterStatus = strtolower((string) ($emp['status'] ?? 'aktif'));
                             ?>
                             <tr>
                                 <!-- Kolom NIP Badge -->
@@ -207,9 +243,13 @@ require __DIR__ . '/partials/header.php';
                                 <!-- Kolom Nama + Avatar + Jabatan -->
                                 <td>
                                     <div class="d-flex align-items-center gap-3">
-                                        <div class="roster-avatar-box" style="background-color: <?= $color ?>20; color: <?= $color ?>;">
-                                            <?= e($initial) ?>
-                                        </div>
+                                        <?php if (!empty($emp['foto']) && file_exists(__DIR__ . '/' . $emp['foto'])): ?>
+                                            <img src="<?= $base ?>/<?= e($emp['foto']) ?>" alt="Pasfoto <?= e($emp['nama']) ?>" class="roster-avatar-box" style="object-fit: cover;">
+                                        <?php else: ?>
+                                            <div class="roster-avatar-box" style="background-color: <?= $color ?>20; color: <?= $color ?>;">
+                                                <?= e($initial) ?>
+                                            </div>
+                                        <?php endif; ?>
                                         <div>
                                             <a href="pegawai/detail.php?id=<?= (int) $emp['id'] ?>" class="roster-name-link">
                                                 <?= e($emp['nama']) ?>
@@ -227,6 +267,11 @@ require __DIR__ . '/partials/header.php';
                                         <i class="bi bi-envelope me-1 text-muted"></i>
                                         <?= e($emp['email']) ?>
                                     </a>
+                                </td>
+
+                                <!-- Kolom Status -->
+                                <td>
+                                    <span class="employee-status status-<?= e($rosterStatus) ?>"><i></i><?= e(ucfirst($rosterStatus)) ?></span>
                                 </td>
 
                                 <!-- Kolom Aksi: Quick View AJAX -->
