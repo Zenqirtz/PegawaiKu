@@ -126,12 +126,6 @@ $firstLetter = mb_strtoupper(mb_substr($userName, 0, 1));
                     </div>
                 </form>
 
-                <!-- Status Aktif Pill -->
-                <div class="status-pill d-none d-sm-flex align-items-center">
-                    <span class="status-dot"></span>
-                    <span class="status-text">Aktif</span>
-                </div>
-
                 <!-- Avatar User Header -->
                 <div class="topbar-user-avatar" title="<?= e($userName) ?>">
                     <span><?= e($firstLetter) ?></span>

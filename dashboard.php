@@ -70,10 +70,7 @@ require __DIR__ . '/partials/header.php';
 <div class="dashboard-hero mb-4">
     <div class="row align-items-center g-3">
         <div class="col-lg-7">
-            <span class="hero-tag-badge">
-                <i class="bi bi-shield-check me-1"></i> SISTEM HR TERINTEGRASI &bull; Periode Fiskal <?= date('Y') ?>
-            </span>
-            <h1 class="hero-title mt-2 mb-1">
+            <h1 class="hero-title mt-0 mb-1">
                 Selamat Datang Kembali, <?= e($userName) ?> <span class="wave-emoji">&#128075;</span>
             </h1>
             <p class="hero-subtitle mb-3">
@@ -84,9 +81,6 @@ require __DIR__ . '/partials/header.php';
                 <button class="btn btn-hero-date" type="button" title="Tanggal Hari Ini">
                     <i class="bi bi-calendar3 me-1 text-primary"></i> <?= $tanggalSingkat ?>
                 </button>
-                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2.5 py-1.5 rounded-2 small fw-semibold">
-                    <i class="bi bi-shield-lock-fill me-1"></i> Autentikasi Terverifikasi
-                </span>
             </div>
         </div>
         <!-- Elemen Gambar Multimedia Dashboard (SKKNI MUK JWD 1.c) -->
