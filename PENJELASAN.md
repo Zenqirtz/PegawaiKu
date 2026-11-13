@@ -166,11 +166,13 @@
 **Fitur Lengkap:**
 1. **Pencarian (Search):** LIKE query pada kolom nip, nama, email, jabatan secara bersamaan.
 2. **Filter Jabatan:** Dropdown select yang terisi dari `SELECT DISTINCT jabatan`.
-3. **Sortir:** Whitelist array `$sortOptions` — nilai dari URL tidak pernah langsung masuk ORDER BY (anti SQL Injection).
-4. **Pagination:** 7 data per halaman, LIMIT/OFFSET dengan `PDO::PARAM_INT`.
+3. **Filter Status:** Dropdown Aktif / Izin / Cuti (whitelist `$statusOptions`, anti SQL Injection).
+4. **Sortir:** Whitelist array `$sortOptions` — nilai dari URL tidak pernah langsung masuk ORDER BY (anti SQL Injection).
+5. **Pagination:** 7 data per halaman, LIMIT/OFFSET dengan `PDO::PARAM_INT`.
+6. **Statistik real-time:** Total Pegawai, Jumlah Jabatan, dan Sedang Cuti / Izin (`COUNT` langsung dari kolom `status`).
 
 **Alur Backend:**
-1. Ambil parameter `q`, `jabatan`, `sort`, `page` dari `$_GET`.
+1. Ambil parameter `q`, `jabatan`, `status`, `sort`, `page` dari `$_GET`.
 2. Bangun klausa `WHERE` secara dinamis (hanya ditambah jika filter terisi).
 3. Hitung `$totalFiltered` (COUNT dengan WHERE) untuk pagination.
 4. Query data dengan `LIMIT :limit OFFSET :offset`.
@@ -178,9 +180,9 @@
 
 **Alur Frontend:**
 - Breadcrumb: Dashboard > Data Pegawai.
-- Stat cards: Total Pegawai dan Jumlah Jabatan.
-- Filter bar: search input + dropdown jabatan + dropdown sortir + tombol filter + tombol reset.
-- Tabel data: No, NIP, Nama (dengan avatar inisial), Email, Jabatan, Status, Aksi (Quick View / Edit / Hapus).
+- Stat cards: Total Pegawai, Jumlah Jabatan, dan Sedang Cuti / Izin.
+- Filter bar: search input + dropdown jabatan + dropdown status + dropdown sortir + tombol filter + tombol reset.
+- Tabel data: No, NIP, Nama (dengan avatar inisial/foto), Email, Jabatan, Status (badge warna per status), Aksi (Quick View / Edit / Hapus).
 - Footer pagination: "Menampilkan x-y dari N" + navigasi halaman.
 - Tombol hapus menggunakan form POST (bukan link GET) dengan konfirmasi JavaScript.
 
@@ -192,7 +194,7 @@
 
 **Alur:**
 1. Cek login, ambil flash message, muat header.
-2. Tampilkan form dengan field: NIP, Nama, Email, Jabatan.
+2. Tampilkan form dengan field: NIP, Nama, Email, Jabatan, Status Kepegawaian (Aktif/Izin/Cuti).
 3. Setiap field memiliki ikon, label, dan petunjuk (hint).
 4. CSRF token disisipkan sebagai hidden input.
 5. Form dikirim via POST ke `../proses/simpan.php`.

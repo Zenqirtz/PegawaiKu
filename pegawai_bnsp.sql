@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS employees (
     nama VARCHAR(100) NOT NULL,
     email VARCHAR(100),
     jabatan VARCHAR(80),
+    status ENUM('aktif', 'izin', 'cuti') NOT NULL DEFAULT 'aktif',
     foto VARCHAR(255) DEFAULT NULL
 );
 

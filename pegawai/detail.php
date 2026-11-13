@@ -23,7 +23,7 @@ if ($id <= 0) {
 
 // --- 2. Query Data Pegawai Berdasarkan ID ---
 // Menggunakan prepared statement (:id) untuk mencegah SQL Injection
-$stmt = $pdo->prepare('SELECT id, nip, nama, email, jabatan, foto FROM employees WHERE id = :id');
+$stmt = $pdo->prepare('SELECT id, nip, nama, email, jabatan, status, foto FROM employees WHERE id = :id');
 $stmt->execute(['id' => $id]);
 $employee = $stmt->fetch();
 
@@ -106,6 +106,15 @@ require __DIR__ . '/../partials/header.php';
         <div class="col-sm-6">
             <div class="text-secondary small fw-semibold mb-1">Jabatan</div>
             <div><?= e($employee['jabatan'] ?: '-') ?></div>
+        </div>
+
+        <!-- Status Kepegawaian -->
+        <div class="col-sm-6">
+            <div class="text-secondary small fw-semibold mb-1">Status Kepegawaian</div>
+            <div>
+                <?php $currStatus = strtolower((string) ($employee['status'] ?? 'aktif')); ?>
+                <span class="employee-status status-<?= e($currStatus) ?>"><i></i><?= e(ucfirst($currStatus)) ?></span>
+            </div>
         </div>
 
     </div>

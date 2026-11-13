@@ -24,7 +24,7 @@ if ($id <= 0) {
 
 // --- 2. Ambil Data Pegawai Lama dari Database ---
 // Menggunakan prepared statement untuk mencegah manipulasi query (SQL Injection)
-$stmt = $pdo->prepare('SELECT id, nip, nama, email, jabatan, foto FROM employees WHERE id = :id');
+$stmt = $pdo->prepare('SELECT id, nip, nama, email, jabatan, status, foto FROM employees WHERE id = :id');
 $stmt->execute(['id' => $id]);
 $employee = $stmt->fetch();
 
@@ -185,6 +185,24 @@ require __DIR__ . '/../partials/header.php';
                     </div>
                     <div class="input-hint"><i class="bi bi-info-circle"></i> Tentukan formasi jabatan struktural atau fungsional sesuai kebutuhan instansi.</div>
                     <div class="invalid-feedback">Jabatan wajib diisi.</div>
+                </div>
+
+                <!-- Input Status Kepegawaian -->
+                <div class="col-md-6 mb-3">
+                    <label class="input-label-modern" for="status">
+                        <span>Status Kepegawaian <span class="text-danger">*</span></span>
+                    </label>
+                    <div class="input-group-modern">
+                        <i class="bi bi-person-check input-group-icon"></i>
+                        <select class="form-control-modern form-select-modern" id="status" name="status" required>
+                            <?php $currStatus = strtolower((string) ($employee['status'] ?? 'aktif')); ?>
+                            <option value="aktif" <?= $currStatus === 'aktif' ? 'selected' : '' ?>>Aktif</option>
+                            <option value="izin" <?= $currStatus === 'izin' ? 'selected' : '' ?>>Izin</option>
+                            <option value="cuti" <?= $currStatus === 'cuti' ? 'selected' : '' ?>>Cuti</option>
+                        </select>
+                    </div>
+                    <div class="input-hint"><i class="bi bi-info-circle"></i> Status operasional pegawai saat ini (Aktif, Izin, Cuti).</div>
+                    <div class="invalid-feedback">Status kepegawaian wajib dipilih.</div>
                 </div>
             </div>
         </div>

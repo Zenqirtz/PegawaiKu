@@ -1715,6 +1715,30 @@ body, button, input, select, textarea { font-family: 'Plus Jakarta Sans', system
     background: #10b981;
 }
 
+.employee-status.status-aktif {
+    background: #ecfdf5;
+    color: #059669;
+}
+.employee-status.status-aktif i {
+    background: #10b981;
+}
+
+.employee-status.status-izin {
+    background: #fffbeb;
+    color: #b45309;
+}
+.employee-status.status-izin i {
+    background: #f59e0b;
+}
+
+.employee-status.status-cuti {
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+.employee-status.status-cuti i {
+    background: #3b82f6;
+}
+
 .employee-actions {
     display: inline-flex;
     gap: 0.35rem;

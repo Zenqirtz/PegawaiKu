@@ -14,7 +14,18 @@ checkLogin();
 // Semua parameter diketik ke string agar aman sebelum dipakai di query.
 $search = trim((string) ($_GET['q'] ?? ''));            // kata kunci pencarian
 $jabatanFilter = trim((string) ($_GET['jabatan'] ?? '')); // jabatan yang dipilih
+$statusFilter = trim((string) ($_GET['status'] ?? ''));   // status kepegawaian yang dipilih
 $sort = (string) ($_GET['sort'] ?? 'newest');           // pilihan urutan
+
+// Daftar status yang valid (whitelist) agar nilai dari URL aman dipakai di query.
+$statusOptions = [
+    'aktif' => 'Aktif',
+    'izin'  => 'Izin',
+    'cuti'  => 'Cuti',
+];
+if (!isset($statusOptions[$statusFilter])) {
+    $statusFilter = '';
+}
 
 // Daftar urutan yang diizinkan (whitelist).
 // Tujuannya: nilai dari URL TIDAK boleh langsung masuk ke klausa ORDER BY
@@ -46,16 +57,24 @@ if ($jabatanFilter !== '') {
     $where[] = 'jabatan = :jabatan_filter';
     $params['jabatan_filter'] = $jabatanFilter;
 }
+if ($statusFilter !== '') {
+    // Filter status memakai pencocokan persis (=).
+    $where[] = 'status = :status_filter';
+    $params['status_filter'] = $statusFilter;
+}
 $whereSql = $where ? ' WHERE ' . implode(' AND ', $where) : '';
 
-// --- 3. Data untuk dropdown filter dan kartu statistik ---
+// --- 3. Data untuk dropdown filter dan kartu statistik real-time ---
 // DISTINCT = ambil nama jabatan unik saja (tanpa duplikat).
 $jabatanList = $pdo->query("SELECT DISTINCT jabatan FROM employees WHERE jabatan IS NOT NULL AND jabatan <> '' ORDER BY jabatan")
     ->fetchAll(PDO::FETCH_COLUMN);
 $totalPegawai = (int) $pdo->query('SELECT COUNT(*) FROM employees')->fetchColumn();
 $totalJabatan = (int) $pdo->query("SELECT COUNT(DISTINCT jabatan) FROM employees WHERE jabatan IS NOT NULL AND jabatan <> ''")->fetchColumn();
-$totalCuti = 6;
-$totalCutiTahunan = 4;
+
+// Statistik Cuti & Izin real-time dari database
+$totalCutiIzin = (int) $pdo->query("SELECT COUNT(*) FROM employees WHERE status IN ('cuti', 'izin')")->fetchColumn();
+$totalCuti = (int) $pdo->query("SELECT COUNT(*) FROM employees WHERE status = 'cuti'")->fetchColumn();
+$totalIzin = (int) $pdo->query("SELECT COUNT(*) FROM employees WHERE status = 'izin'")->fetchColumn();
 
 // --- 4. Hitung jumlah data SETELAH filter ---
 // Dipakai untuk teks "Menampilkan x-y dari N data" dan jumlah halaman.
@@ -68,7 +87,7 @@ $totalPages = max(1, (int) ceil($totalFiltered / $perPage));
 $page = min($page, $totalPages);          // cegah halaman melebihi batas
 $offset = ($page - 1) * $perPage;         // baris pertama pada halaman ini
 
-$stmt = $pdo->prepare('SELECT id, nip, nama, email, jabatan, foto FROM employees' . $whereSql . ' ORDER BY ' . $orderBy . ' LIMIT :limit OFFSET :offset');
+$stmt = $pdo->prepare('SELECT id, nip, nama, email, jabatan, foto, status FROM employees' . $whereSql . ' ORDER BY ' . $orderBy . ' LIMIT :limit OFFSET :offset');
 
 // Parameter filter diikat sebagai string (LIKE / =).
 foreach ($params as $key => $value) {
@@ -88,7 +107,7 @@ require __DIR__ . '/../partials/header.php';
 
 // --- 8. Helper URL pagination ---
 // Menjaga filter pencarian/jabatan/sortir tetap terpakai saat pindah halaman.
-$queryBase = ['q' => $search, 'jabatan' => $jabatanFilter, 'sort' => $sort];
+$queryBase = ['q' => $search, 'jabatan' => $jabatanFilter, 'status' => $statusFilter, 'sort' => $sort];
 $pageUrl = static function (int $targetPage) use ($queryBase): string {
     return 'index.php?' . http_build_query($queryBase + ['page' => $targetPage]);
 };
@@ -119,7 +138,7 @@ $pageUrl = static function (int $targetPage) use ($queryBase): string {
     <div class="employee-stat-grid">
         <div class="employee-stat-card"><div><span>Total Pegawai</span><strong><?= number_format($totalPegawai) ?></strong><small>Seluruh data pegawai</small></div><i class="bi bi-people-fill stat-blue"></i></div>
         <div class="employee-stat-card"><div><span>Jumlah Jabatan</span><strong><?= number_format($totalJabatan) ?></strong><small>Jabatan berbeda</small></div><i class="bi bi-briefcase-fill stat-violet"></i></div>
-        <div class="employee-stat-card"><div><span>Sedang Cuti / Izin</span><strong><?= number_format($totalCuti) ?></strong><small><?= number_format($totalCutiTahunan) ?> cuti tahunan</small></div><i class="bi bi-calendar-x stat-cyan"></i></div>
+        <div class="employee-stat-card"><div><span>Sedang Cuti / Izin</span><strong><?= number_format($totalCutiIzin) ?></strong><small><?= number_format($totalCuti) ?> cuti tahunan<?= $totalIzin > 0 ? ', ' . number_format($totalIzin) . ' izin' : '' ?></small></div><i class="bi bi-calendar-x stat-blue"></i></div>
     </div>
 
     <form class="employee-filter-bar" method="get" action="index.php">
@@ -130,6 +149,12 @@ $pageUrl = static function (int $targetPage) use ($queryBase): string {
                 <option value="<?= e($jabatan) ?>" <?= $jabatanFilter === $jabatan ? 'selected' : '' ?>><?= e($jabatan) ?></option>
             <?php endforeach; ?>
         </select>
+        <select name="status" aria-label="Filter status">
+            <option value="">Semua Status</option>
+            <option value="aktif" <?= $statusFilter === 'aktif' ? 'selected' : '' ?>>Aktif</option>
+            <option value="izin" <?= $statusFilter === 'izin' ? 'selected' : '' ?>>Izin</option>
+            <option value="cuti" <?= $statusFilter === 'cuti' ? 'selected' : '' ?>>Cuti</option>
+        </select>
         <select name="sort" aria-label="Urutkan pegawai">
             <option value="newest" <?= $sort === 'newest' ? 'selected' : '' ?>>NIP Terbaru</option>
             <option value="oldest" <?= $sort === 'oldest' ? 'selected' : '' ?>>NIP Terlama</option>
@@ -137,7 +162,7 @@ $pageUrl = static function (int $targetPage) use ($queryBase): string {
             <option value="nip" <?= $sort === 'nip' ? 'selected' : '' ?>>NIP A–Z</option>
         </select>
         <button class="btn btn-outline-primary employee-filter-submit" type="submit" aria-label="Terapkan filter"><i class="bi bi-sliders"></i><span>Filter</span></button>
-        <?php if ($search !== '' || $jabatanFilter !== '' || $sort !== 'newest'): ?><a class="employee-reset" href="index.php" title="Reset filter"><i class="bi bi-arrow-counterclockwise"></i></a><?php endif; ?>
+        <?php if ($search !== '' || $jabatanFilter !== '' || $statusFilter !== '' || $sort !== 'newest'): ?><a class="employee-reset" href="index.php" title="Reset filter"><i class="bi bi-arrow-counterclockwise"></i></a><?php endif; ?>
     </form>
 
     <section class="employee-table-card">
@@ -158,7 +183,8 @@ $pageUrl = static function (int $targetPage) use ($queryBase): string {
                         <td><div class="employee-name-cell"><?php if (!empty($emp['foto']) && file_exists(__DIR__ . '/../' . $emp['foto'])): ?><img class="employee-initials employee-photo" src="<?= $base ?>/<?= e($emp['foto']) ?>" alt="Pasfoto <?= e($emp['nama']) ?>"><?php else: ?><span class="employee-initials"><?= e($initials) ?></span><?php endif; ?><div><a href="detail.php?id=<?= (int) $emp['id'] ?>"><?= e($emp['nama']) ?></a><small><?= e($emp['jabatan']) ?></small></div></div></td>
                         <td><a class="employee-email" href="mailto:<?= e($emp['email']) ?>"><?= e($emp['email']) ?></a></td>
                         <td><span class="employee-position"><?= e($emp['jabatan']) ?></span></td>
-                        <td><span class="employee-status"><i></i>Terdaftar</span></td>
+                        <?php $employeeStatus = (string) ($emp['status'] ?? 'aktif'); ?>
+                        <td><span class="employee-status status-<?= e($employeeStatus) ?>"><i></i><?= e(ucfirst($employeeStatus)) ?></span></td>
                         <td class="text-end text-nowrap">
                             <div class="employee-actions">
                                 <!-- Quick View AJAX: muat detail ke modal tanpa reload halaman -->

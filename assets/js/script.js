@@ -254,8 +254,10 @@ $(function () {
                                 '<span class="quickview-info-value fw-semibold">' + escapeHtml(d.jabatan) + '</span>' +
                             '</div>' +
                             '<div class="quickview-info-item">' +
-                                '<span class="quickview-info-label"><i class="bi bi-check-circle me-2 text-success"></i>Status Kepegawaian</span>' +
-                                '<span class="quickview-info-value text-success fw-semibold"><i class="bi bi-patch-check-fill me-1"></i>Terdaftar Aktif</span>' +
+                                '<span class="quickview-info-label"><i class="bi bi-person-check me-2 text-primary"></i>Status Kepegawaian</span>' +
+                                '<span class="quickview-info-value">' +
+                                    '<span class="employee-status status-' + escapeHtml(d.status || 'aktif') + '"><i></i>' + escapeHtml((d.status || 'aktif').charAt(0).toUpperCase() + (d.status || 'aktif').slice(1)) + '</span>' +
+                                '</span>' +
                             '</div>' +
                         '</div>';
                     $content.html(html);
@@ -336,6 +338,11 @@ $(function () {
                     el: $('#jabatan'),
                     check: v => v.trim() !== '',
                     feedback: 'Jabatan / posisi kerja wajib diisi.'
+                },
+                status: {
+                    el: $('#status'),
+                    check: v => ['aktif', 'izin', 'cuti'].includes((v || '').trim().toLowerCase()),
+                    feedback: 'Status kepegawaian wajib dipilih.'
                 },
             };
 

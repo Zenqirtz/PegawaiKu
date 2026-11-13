@@ -37,6 +37,12 @@ $nipNama         = trim((string) ($_POST['nip'] ?? ''));
 $namaPegawai     = trim((string) ($_POST['nama'] ?? ''));
 $emailPegawai    = trim((string) ($_POST['email'] ?? ''));
 $jabatanPegawai  = trim((string) ($_POST['jabatan'] ?? ''));
+$statusPegawai   = strtolower(trim((string) ($_POST['status'] ?? 'aktif')));
+
+// Whitelist status: nilai di luar daftar ini ditolak/dianggap 'aktif'.
+if (!in_array($statusPegawai, ['aktif', 'izin', 'cuti'], true)) {
+    $statusPegawai = 'aktif';
+}
 
 // NIP input may contain spaces for readability; remove whitespace before validation/storage checks.
 $nipClean = preg_replace('/\s+/', '', $nipNama) ?? '';
@@ -99,8 +105,8 @@ try {
 
 // --- 8. Eksekusi Query INSERT dengan Prepared Statement ---
 // Prepared statement melindungi database dari serangan SQL Injection
-$sql = 'INSERT INTO employees (nip, nama, email, jabatan, foto)
-        VALUES (:nip, :nama, :email, :jabatan, :foto)';
+$sql = 'INSERT INTO employees (nip, nama, email, jabatan, status, foto)
+        VALUES (:nip, :nama, :email, :jabatan, :status, :foto)';
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute([
@@ -108,6 +114,7 @@ $stmt->execute([
     'nama'    => $namaPegawai,
     'email'   => $emailPegawai,
     'jabatan' => $jabatanPegawai,
+    'status'  => $statusPegawai,
     'foto'    => $fotoPath,
 ]);
 

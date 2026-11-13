@@ -153,6 +153,23 @@ require __DIR__ . '/../partials/header.php';
                     <div class="input-hint"><i class="bi bi-info-circle"></i> Tentukan formasi jabatan struktural atau fungsional sesuai kebutuhan instansi.</div>
                     <div class="invalid-feedback">Jabatan wajib diisi.</div>
                 </div>
+
+                <!-- Input Status Kepegawaian -->
+                <div class="col-md-6 mb-3">
+                    <label class="input-label-modern" for="status">
+                        <span>Status Kepegawaian <span class="text-danger">*</span></span>
+                    </label>
+                    <div class="input-group-modern">
+                        <i class="bi bi-person-check input-group-icon"></i>
+                        <select class="form-control-modern form-select-modern" id="status" name="status" required>
+                            <option value="aktif" selected>Aktif</option>
+                            <option value="izin">Izin</option>
+                            <option value="cuti">Cuti</option>
+                        </select>
+                    </div>
+                    <div class="input-hint"><i class="bi bi-info-circle"></i> Status operasional pegawai saat ini (Aktif, Izin, Cuti).</div>
+                    <div class="invalid-feedback">Status kepegawaian wajib dipilih.</div>
+                </div>
             </div>
         </div>
 

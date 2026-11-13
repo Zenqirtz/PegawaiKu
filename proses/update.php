@@ -43,9 +43,15 @@ $nipNama         = trim((string) ($_POST['nip'] ?? ''));
 $namaPegawai     = trim((string) ($_POST['nama'] ?? ''));
 $emailPegawai    = trim((string) ($_POST['email'] ?? ''));
 $jabatanPegawai  = trim((string) ($_POST['jabatan'] ?? ''));
+$statusPegawai   = strtolower(trim((string) ($_POST['status'] ?? 'aktif')));
+if (!in_array($statusPegawai, ['aktif', 'izin', 'cuti'], true)) {
+    setFlash('danger', 'Status kepegawaian tidak valid.');
+    header("Location: ../pegawai/edit.php?id={$id}");
+    exit;
+}
 
 // --- 5. Validasi Server-Side ---
-if ($nipNama === '' || $namaPegawai === '' || $emailPegawai === '' || $jabatanPegawai === '') {
+if ($nipNama === '' || $namaPegawai === '' || $emailPegawai === '' || $jabatanPegawai === '' || $statusPegawai === '') {
     setFlash('danger', 'Semua kolom bertanda bintang (*) wajib diisi.');
     header("Location: ../pegawai/edit.php?id={$id}");
     exit;
@@ -109,7 +115,7 @@ if ($newFotoPath !== null) {
 
 // --- 9. Eksekusi Query UPDATE dengan Prepared Statement ---
 $sql = 'UPDATE employees
-        SET nip = :nip, nama = :nama, email = :email, jabatan = :jabatan, foto = :foto
+        SET nip = :nip, nama = :nama, email = :email, jabatan = :jabatan, status = :status, foto = :foto
         WHERE id = :id';
 
 $stmt = $pdo->prepare($sql);
@@ -118,6 +124,7 @@ $stmt->execute([
     'nama'    => $namaPegawai,
     'email'   => $emailPegawai,
     'jabatan' => $jabatanPegawai,
+    'status'  => $statusPegawai,
     'foto'    => $fotoPath,
     'id'      => $id,
 ]);
