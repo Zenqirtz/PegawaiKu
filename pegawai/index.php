@@ -54,6 +54,8 @@ $jabatanList = $pdo->query("SELECT DISTINCT jabatan FROM employees WHERE jabatan
     ->fetchAll(PDO::FETCH_COLUMN);
 $totalPegawai = (int) $pdo->query('SELECT COUNT(*) FROM employees')->fetchColumn();
 $totalJabatan = (int) $pdo->query("SELECT COUNT(DISTINCT jabatan) FROM employees WHERE jabatan IS NOT NULL AND jabatan <> ''")->fetchColumn();
+$totalCuti = 6;
+$totalCutiTahunan = 4;
 
 // --- 4. Hitung jumlah data SETELAH filter ---
 // Dipakai untuk teks "Menampilkan x-y dari N data" dan jumlah halaman.
@@ -117,6 +119,7 @@ $pageUrl = static function (int $targetPage) use ($queryBase): string {
     <div class="employee-stat-grid">
         <div class="employee-stat-card"><div><span>Total Pegawai</span><strong><?= number_format($totalPegawai) ?></strong><small>Seluruh data pegawai</small></div><i class="bi bi-people-fill stat-blue"></i></div>
         <div class="employee-stat-card"><div><span>Jumlah Jabatan</span><strong><?= number_format($totalJabatan) ?></strong><small>Jabatan berbeda</small></div><i class="bi bi-briefcase-fill stat-violet"></i></div>
+        <div class="employee-stat-card"><div><span>Sedang Cuti / Izin</span><strong><?= number_format($totalCuti) ?></strong><small><?= number_format($totalCutiTahunan) ?> cuti tahunan</small></div><i class="bi bi-calendar-x stat-cyan"></i></div>
     </div>
 
     <form class="employee-filter-bar" method="get" action="index.php">
