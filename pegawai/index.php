@@ -125,7 +125,12 @@ $pageUrl = static function (int $targetPage) use ($queryBase): string {
             <p>Kelola dan pantau data pegawai dalam satu tempat.</p>
         </div>
         <div class="employee-heading-actions">
-            <a class="btn btn-primary" href="tambah.php"><i class="bi bi-person-plus-fill me-1"></i> Tambah Pegawai</a>
+            <a class="btn btn-outline-danger me-2" href="export_pdf.php" target="_blank" title="Export Seluruh Data Pegawai ke PDF">
+                <i class="bi bi-file-earmark-pdf-fill me-1"></i> Export PDF
+            </a>
+            <a class="btn btn-primary" href="tambah.php">
+                <i class="bi bi-person-plus-fill me-1"></i> Tambah Pegawai
+            </a>
         </div>
     </div>
 

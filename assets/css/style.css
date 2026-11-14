@@ -754,6 +754,33 @@ button, input, select, textarea {
     letter-spacing: -0.015em;
 }
 
+/* Animasi Running Text (Marquee) Bolak-Balik / Running Back */
+.hero-title.marquee-wrapper {
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+    max-width: 100%;
+}
+
+.marquee-text {
+    display: inline-block;
+    will-change: transform;
+    animation: marqueeAlternate 8s ease-in-out infinite alternate;
+}
+
+.hero-title.marquee-wrapper:hover .marquee-text {
+    animation-play-state: paused;
+}
+
+@keyframes marqueeAlternate {
+    0% {
+        transform: translateX(0%);
+    }
+    100% {
+        transform: translateX(40px);
+    }
+}
+
 .hero-subtitle {
     color: #64748b;
     font-size: 0.875rem;

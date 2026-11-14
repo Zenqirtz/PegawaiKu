@@ -76,8 +76,8 @@ require __DIR__ . '/partials/header.php';
 <div class="dashboard-hero mb-4">
     <div class="row align-items-center g-3">
         <div class="col-lg-7">
-            <h1 class="hero-title mt-0 mb-1">
-                Selamat Datang Kembali, <?= e($userName) ?> <span class="wave-emoji">&#128075;</span>
+            <h1 class="hero-title mt-0 mb-1 marquee-wrapper">
+                <span class="marquee-text">Selamat Datang Kembali, <?= e($userName) ?> <span class="wave-emoji">&#128075;</span></span>
             </h1>
             <p class="hero-subtitle mb-3">
                 Berikut adalah ikhtisar ringkasan data kepegawaian hari ini, <?= $tanggalLengkap ?>.
